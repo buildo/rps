@@ -14,25 +14,37 @@ object Move {
   case object Scissor extends Move
 }
 
+sealed trait Result
+object Result {
+  case object Win extends Result
+  case object Lose extends Result
+  case object Draw extends Result
+}
+
 trait Game {
   def play(): Unit = {
+    import Result._
     val move = readLine("your move> ")
-    run(move)
-  }
-
-  private def run(move: String) = {
-    val computerMove = generateComputerMove
-    val userMove = toMove(move)
-    import Move._
-    (userMove, computerMove) match {
-      case (Rock, Scissor) => println("win!")
-      case (Paper, Rock) => println("win!")
-      case (Scissor, Paper) => println("win!")
-      case (m1, m2) if m1 == m2 => println("draw!")
-      case _ => println("lose")
+    val (result, userMove, computerMove) = run(move)
+    result match {
+      case Win => println("You win!")
+      case Lose => println("You lose!")
+      case Draw => println("It's a draw!")
     }
     println(s"User:     $userMove")
     println(s"Computer: $computerMove")
+  }
+
+  private def run(move: String): (Result, Move, Move) = {
+    val computerMove = generateComputerMove
+    val userMove = toMove(move)
+    import Move._
+    val result = (userMove, computerMove) match {
+      case (Rock, Scissor) | (Paper, Rock) | (Scissor, Paper) => Result.Win
+      case (m1, m2) if m1 == m2 => Result.Draw
+      case _ => Result.Lose
+    }
+    (result, userMove, computerMove)
   }
 
   private def toMove(s: String): Move = s match {
