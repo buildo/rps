@@ -2,23 +2,23 @@ package rps
 
 import scala.io.StdIn.readLine
 import scala.util.Random.shuffle
+import io.buildo.enumero.annotations.enum
+import io.buildo.enumero.CaseEnumSerialization
 
 object Main extends App with Game {
   play()
 }
 
-sealed trait Move
-object Move {
-  case object Rock extends Move
-  case object Paper extends Move
-  case object Scissor extends Move
+@enum trait Move {
+  object Rock
+  object Paper
+  object Scissor
 }
 
-sealed trait Result
-object Result {
-  case object Win extends Result
-  case object Lose extends Result
-  case object Draw extends Result
+@enum trait Result {
+  object Win
+  object Lose
+  object Draw
 }
 
 trait Game {
@@ -66,9 +66,7 @@ trait Game {
     case _ => None
   }
 
-  private def generateComputerMove: Move = {
-    import Move._
-    shuffle(List(Rock, Paper, Scissor)).head
-  }
+  private def generateComputerMove: Move =
+    shuffle(CaseEnumSerialization[Move].values.toList).head
 
 }
