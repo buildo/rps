@@ -2,23 +2,27 @@ package rps
 
 import scala.io.StdIn.readLine
 import scala.util.Random.shuffle
+import io.buildo.enumero.annotations.enum
 
 object Main extends App with Game {
   play()
 }
 
-sealed trait Result
-object Result {
-  case object Win extends Result
-  case object Lose extends Result
-  case object Draw extends Result
+@enum trait GameKind {
+  object RPS
+  object RPSLS
 }
 
-sealed trait Move
-object Move {
-  case object Rock extends Move
-  case object Paper extends Move
-  case object Scissor extends Move
+@enum trait Result {
+  object Win
+  object Lose
+  object Draw
+}
+
+@enum trait Move {
+  object Rock
+  object Paper
+  object Scissor
 }
 
 trait Game {
