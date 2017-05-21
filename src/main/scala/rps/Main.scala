@@ -48,14 +48,22 @@ trait Game {
   private def run(move: String): Option[(Result, Move, Move)] = {
     val computerMove = generateComputerMove
     val userMove = toMove(move)
-    import Move._
     userMove.map { userMove =>
       val result = (userMove, computerMove) match {
-        case (Rock, Scissor) | (Paper, Rock) | (Scissor, Paper) => Result.Win
+        case (m1, m2) if m1 > m2  => Result.Win
+        case (m1, m2) if m1 < m2  => Result.Lose
         case (m1, m2) if m1 == m2 => Result.Draw
-        case _ => Result.Lose
       }
       (result, userMove, computerMove)
+    }
+  }
+
+  implicit class OrderedMove(m1: Move) extends Ordered[Move] {
+    import Move._
+    def compare(m2: Move): Int = (m1, m2) match {
+      case (Rock, Scissor) | (Paper, Rock) | (Scissor, Paper) => 1
+      case (m1, m2) if m1 == m2 => 0
+      case _ => -1
     }
   }
 
