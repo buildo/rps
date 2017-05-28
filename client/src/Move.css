@@ -1,0 +1,4 @@
+img.move.flipped {
+  transform: scaleX(-1);
+}
+
