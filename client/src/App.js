@@ -23,7 +23,7 @@ fetchMock
     { method: 'POST' }
   );
 
-// fetchMock.restore();
+fetchMock.restore();
 
 class App extends Component {
 
