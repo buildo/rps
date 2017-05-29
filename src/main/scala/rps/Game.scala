@@ -5,10 +5,6 @@ import scala.util.Random.shuffle
 import io.buildo.enumero.annotations.enum
 import io.buildo.enumero.CaseEnumSerialization
 
-object Main extends App with Game {
-  play()
-}
-
 @enum trait Move {
   Rock
   Paper
@@ -17,7 +13,7 @@ object Main extends App with Game {
 
 @enum trait Result {
   Win
-  Tie
+  Draw
   Lose
 }
 
@@ -60,10 +56,12 @@ trait Game {
     userMove.map { userMove =>
       val result = (userMove, computerMove) match {
         case (Rock, Scissors) | (Scissors, Paper) | (Paper, Rock) => Result.Win
-        case (m1, m2) if (m1 == m2) => Result.Tie
+        case (m1, m2) if (m1 == m2) => Result.Draw
         case _ => Result.Lose
       }
       (result, userMove, computerMove)
     }
   }
 }
+
+object Game extends Game
