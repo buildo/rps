@@ -8,6 +8,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.model.StatusCodes._
 import akka.stream.ActorMaterializer
 
 import scala.io.StdIn
@@ -26,16 +27,14 @@ object WebServer extends App {
   case class PlayResult(result: Result, userMove: Move, computerMove: Move)
   case class Error(message: String)
 
-  val route =
+  def route =
     pathPrefix("rps") {
       path("play") {
         post {
           entity(as[PlayPayload]) { payload =>
-            complete {
-              Game.run(payload.userMove) match {
-                case Some((result, userMove, computerMove)) => PlayResult(result, userMove, computerMove)
-                case None => Error(s"${payload.userMove} is an invalid move. Try again!")
-              }
+            Game.run(payload.userMove) match {
+              case Some((result, userMove, computerMove)) => complete(PlayResult(result, userMove, computerMove))
+              case None => complete(UnprocessableEntity, Error(s"${payload.userMove} is an invalid move. Try again!"))
             }
           }
         }

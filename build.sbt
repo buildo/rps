@@ -13,5 +13,13 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic"
 ).map(_ % "0.8.0")
 
+libraryDependencies ++= Seq(
+  "org.scalacheck" %% "scalacheck" % "1.13.5",
+  "org.scalatest" %% "scalatest" % "3.0.1",
+  "com.typesafe.akka" %% "akka-http-testkit" % "10.0.2"
+).map(_ % Test)
+
+
+
 addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
 resolvers += Resolver.bintrayRepo("buildo", "maven")
