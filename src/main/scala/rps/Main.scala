@@ -33,10 +33,18 @@ object WebServer extends App {
         post {
           entity(as[PlayPayload]) { payload =>
             Game.run(payload.userMove) match {
-              case Some((result, userMove, computerMove)) => complete(PlayResult(result, userMove, computerMove))
+              case Some((result, userMove, computerMove)) => {
+                val playResult = PlayResult(result, userMove, computerMove);
+                complete(ResultDataModule.createResult(playResult).map { _ => playResult })
+              }
               case None => complete(UnprocessableEntity, Error(s"${payload.userMove} is an invalid move. Try again!"))
             }
           }
+        }
+      } ~
+      path("results") {
+        get {
+          complete(ResultDataModule.getResults().map { results => results.reverse })
         }
       }
     } ~
