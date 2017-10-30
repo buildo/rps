@@ -1,10 +1,9 @@
 package rps.model
 
-import io.buildo.enumero.annotations.indexedEnum
+import io.buildo.enumero.annotations.enum
 
-@indexedEnum trait Move {
-  type Index = String
-  object Rock { "0" }
-  object Paper { "1" }
-  object Scissors { "2" }
+@enum trait Move {
+  object Rock
+  object Paper
+  object Scissors
 }
