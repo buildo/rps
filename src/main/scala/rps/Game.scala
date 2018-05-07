@@ -11,7 +11,7 @@ object Game{
     }
 
     def chooseShape() : Shape = {
-        println("Please, choose your shape: (0 for Rock | 1 for Paper| 2 for Scissor)")
+        println("Please, choose your shape: (0 for Rock | 1 for Paper | 2 for Scissor)")
         val input = scala.io.StdIn.readLine()
         input match{
             case Shape(input) => input
@@ -30,6 +30,7 @@ object Game{
             case (Paper, Scissor) => new Victory(p2.player)
             case (Scissor, Paper) => new Victory(p1.player)
             case (Scissor, Rock) => new Victory(p2.player)
+            case _ => throw new RuntimeException("ArgumentOufOfRange")
         }
     }
 }

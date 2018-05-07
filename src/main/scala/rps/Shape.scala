@@ -20,6 +20,6 @@ object Shape {
     def unapply(s: String) : Option[Shape] = try{
         Shape.unapply(s.toInt)
     } catch{
-        case _ => None
+        case _ : Throwable => None
     }
 }
