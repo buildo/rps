@@ -2,7 +2,7 @@ package rps
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import akka.http.scaladsl.model.{ HttpResponse, StatusCodes, ContentType, HttpEntity}
+import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTypes, StatusCodes}
 import wiro.Config
 import wiro.server.akkaHttp._
 import wiro.server.akkaHttp.FailSupport._
@@ -18,13 +18,21 @@ object Main extends App with RouterDerivationModule {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  implicit def throwableResponse: ToHttpResponse[Throwable] = null
+  implicit def throwableResponse: ToHttpResponse[Throwable] = { error =>
+    HttpResponse(
+      status = StatusCodes.InternalServerError,
+      entity = error.toString
+    )
+  }
 
-  val usersRouter = deriveRouter[GameApi](new GameApiImpl)
+  val gameRepository = new InMemoryGameRepository
+  val gameService = new GameServiceImpl(gameRepository)
+  val gameController = new GameControllerImpl(gameService)
+  val gameRouter = deriveRouter[GameController](gameController)
 
   val rpcServer = new HttpRPCServer(
     config = Config("localhost", 8080),
-    routers = List(usersRouter)
+    routers = List(gameRouter)
   )
 
 }
