@@ -13,16 +13,15 @@ object Game {
     val computerMove = moveMap(Random.nextInt(3).toString)
     val resultString = s"$move VS $computerMove -> "
     val result =(move, computerMove) match {
-      case (x,y) if x == y => resultString + "Draw!"
-      case ("Rock","Paper") => resultString  + "You lost!"
-      case ("Rock","Scissor") => resultString  + "You win!"
-      case ("Paper","Rock") => resultString  + "You win!"
-      case ("Paper","Scissor") => resultString  + "You lost!"
-      case ("Scissor","Rock") => resultString  + "You lost!"
-      case ("Scissor","Paper") => resultString  + "You win!"
+      case (x,y) if x == y => "Draw!"
+      case ("Rock","Paper") => "You lost!"
+      case ("Rock","Scissor") => "You win!"
+      case ("Paper","Rock") => "You win!"
+      case ("Paper","Scissor") => "You lost!"
+      case ("Scissor","Rock") => "You lost!"
+      case ("Scissor","Paper") => "You win!"
       case (_,_) =>  "Not an Option!"
     }
-    println(result)
-    //play()
+    println(s"$resultString $result")
   }
 }
