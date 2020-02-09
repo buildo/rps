@@ -11,7 +11,7 @@ import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
 import cats.effect.IO
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 
 import rps.model.PlayResponse
 

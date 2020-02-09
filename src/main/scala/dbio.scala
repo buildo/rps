@@ -7,7 +7,7 @@ import cats.~>
 import cats.effect.IO
 
 import slick.dbio.DBIO
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 
 trait DBIOInstances {
   implicit def instance(implicit ec: ExecutionContext): Monad[DBIO] = new Monad[DBIO] {

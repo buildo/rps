@@ -15,9 +15,13 @@ lazy val root = project
       "com.typesafe.slick" %% "slick" % "3.3.2",
       "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
       "org.slf4j" % "slf4j-nop" % "1.6.4",
-      "com.h2database" % "h2" % "1.4.192",
+      "org.postgresql" % "postgresql" % "42.1.4",
       "org.typelevel" %% "cats-core" % "1.0.1",
-      "org.typelevel" %% "cats-effect" % "1.3.0"
+      "org.typelevel" %% "cats-effect" % "1.3.0",
+      "org.scalatest" %% "scalatest" % "3.0.4" % Test,
+      "org.typelevel" %% "cats-laws" % "2.0.0" % Test,
+      "org.scalacheck" %% "scalacheck" % "1.13.4" % Test,
+      "com.github.chocpanda" %% "scalacheck-magnolia" % "0.2.2" % Test
     ),
     addCompilerPlugin(("org.scalamacros" % "paradise" % "2.1.0").cross(CrossVersion.full))
   )

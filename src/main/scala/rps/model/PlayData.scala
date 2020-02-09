@@ -2,7 +2,7 @@ package rps.model
 
 import java.util.UUID
 
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 
 object Tables extends Tables
 

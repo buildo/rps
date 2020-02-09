@@ -42,13 +42,6 @@ final class GameServiceImpl[F[_]: Monad, DB[_]: Monad](repository: GameRepositor
 
   override def getResult(id: UUID): F[Option[Play]] =
     execute.apply {
-      repository.read(id).map { maybePlay =>
-        for {
-          play <- maybePlay
-          userMove <- CaseEnumSerialization[Move].caseFromString(play.userMove)
-          computerMove <- CaseEnumSerialization[Move].caseFromString(play.computerMove)
-          result <- CaseEnumSerialization[Result].caseFromString(play.result)
-        } yield Play(userMove, computerMove, result)
-      }
+      repository.read(id)
     }
 }
