@@ -10,6 +10,8 @@ import wiro.server.akkaHttp.FailSupport._
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
+import cats.effect.IO
+import slick.jdbc.H2Profile.api._
 
 import rps.model.PlayResponse
 
@@ -24,11 +26,17 @@ object Main extends App with RouterDerivationModule {
       entity = error.toString
     )
   }
+  import dbio._
 
-  val gameRepository = new InMemoryGameRepository
-  val gameService = new GameServiceImpl(gameRepository)
+  val db = Database.forConfig("h2mem1")
+  implicit val trans = dbioTransformation(db)
+
+  val gameRepository = new SlickGameRepository
+  val gameService = new GameServiceImpl[IO, DBIO](gameRepository)
   val gameController = new GameControllerImpl(gameService)
   val gameRouter = deriveRouter[GameController](gameController)
+
+  db.run(gameRepository.setup)
 
   val rpcServer = new HttpRPCServer(
     config = Config("localhost", 8080),
