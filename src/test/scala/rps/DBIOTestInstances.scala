@@ -9,8 +9,6 @@ import cats.effect.IO
 
 trait DBIOTestInstances extends ScalaFutures {
 
-  import cats.instances.either._
-
   protected implicit def executionContext: ExecutionContext
   protected def db: Database
 
