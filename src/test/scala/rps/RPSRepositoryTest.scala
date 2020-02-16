@@ -1,7 +1,6 @@
 package rps
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import java.util.UUID
 
 import slick.jdbc.PostgresProfile.api._
 import org.scalatest._
@@ -31,6 +30,18 @@ class RPSRepositoryTest
         } yield res
       }.map { fromDb =>
         fromDb.value shouldBe play
+      }.unsafeRunSync
+    }
+  }
+
+  it("should return None if the play does not exis") {
+    forAll { id: UUID =>
+      withRollback {
+        for {
+          res <- repository.read(id)
+        } yield res
+      }.map { fromDb =>
+        fromDb shouldBe None
       }.unsafeRunSync
     }
   }
