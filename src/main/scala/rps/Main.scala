@@ -12,6 +12,7 @@ import io.circe.generic.auto._
 import io.buildo.enumero.circe._
 
 import rps.model.PlayResponse
+import rps.db.AppDbContext
 
 object Main extends App with RouterDerivationModule {
   implicit val system = ActorSystem("rps")
@@ -25,14 +26,17 @@ object Main extends App with RouterDerivationModule {
     )
   }
 
-  val gameRepository = new InMemoryGameRepository
-  val gameService = new GameServiceImpl(gameRepository)
-  val gameController = new GameControllerImpl(gameService)
-  val gameRouter = deriveRouter[GameController](gameController)
+  val db = AppDbContext.getDBRef("h2mem1")
 
-  val rpcServer = new HttpRPCServer(
-    config = Config("localhost", 8080),
-    routers = List(gameRouter)
-  )
-
+  AppDbContext.createSchema(db).map(_ => {
+    val gameRepository = new GameRepositoryImpl(db)
+    val gameService = new GameServiceImpl(gameRepository)
+    val gameController = new GameControllerImpl(gameService)
+    val gameRouter = deriveRouter[GameController](gameController)
+    
+    val rpcServer = new HttpRPCServer(
+      config = Config("localhost", 8080),
+      routers = List(gameRouter)
+    )
+  })
 }
