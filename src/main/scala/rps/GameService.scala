@@ -23,7 +23,7 @@ class GameServiceImpl(repository: GameRepository) extends GameService {
       case (x, y) if x == y                                     => Draw
       case _                                                    => Lose
     }    
-    val play = Play(UUID.randomUUID, userMove, computerMove, result, Instant.now())
+    val play = Play(userMove, computerMove, result)
 
     repository.save(play)
   }

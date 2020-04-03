@@ -19,7 +19,7 @@ trait GameController {
 class GameControllerImpl(gameService: GameService)(implicit ec: ExecutionContext) extends GameController {
   override def result(): Future[Either[Throwable, PlayResponse]] = {
     gameService.getResult.map(p => p.flatMap(_.toRight(new IllegalStateException).map {
-      play => PlayResponse(play.id, play.userMove, play.computerMove, play.result, play.createdAt)
+      play => PlayResponse(play.userMove, play.computerMove, play.result)
     }))
   }
 
