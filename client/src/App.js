@@ -14,7 +14,7 @@ function randomMove() {
 
 fetchMock
   .mock(
-    'http://localhost:8080/rps/play',
+    'http://localhost:1337/localhost:8080/rps/play',
     (url, { body }) => ({
       userMove: JSON.parse(body).userMove,
       computerMove: randomMove(),
@@ -30,7 +30,7 @@ class App extends Component {
   state = {}
 
   newGame(move) {
-    fetch('http://localhost:8080/rps/play', {
+    fetch('http://localhost:1337/localhost:8080/rps/play', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
