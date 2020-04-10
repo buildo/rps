@@ -1,11 +1,10 @@
 package rps
 
 import java.util.UUID
-
 import scala.concurrent.{ExecutionContext, Future}
 import wiro.annotation._
-
 import model._
+import zio._
 
 @path("rps")
 trait GameController {
@@ -17,11 +16,17 @@ trait GameController {
 }
 
 class GameControllerImpl(gameService: GameService)(implicit ec: ExecutionContext) extends GameController {
-  override def result(): Future[Either[Throwable, PlayResponse]] = {
-    gameService.getResult.map(p => p.flatMap(_.toRight(new IllegalStateException).map {
-      play => PlayResponse(play.userMove, play.computerMove, play.result)
-    }))
-  }
+  val runtime = Runtime.default
 
-  override def play(userMove: Move): Future[Either[Throwable, UUID]] = gameService.playMove(userMove)
+  private[this] def resultZIO = gameService
+    .getResult()
+    .map(_.getOrElse(throw new IllegalStateException))
+    .map(play => PlayResponse(play.userMove, play.computerMove, play.result))
+    .either
+
+  private[this] def playZIO(userMove: Move) = gameService.playMove(userMove).either
+
+  override def result(): Future[Either[Throwable, PlayResponse]] = runtime.unsafeRunToFuture(resultZIO)
+
+  override def play(userMove: Move): Future[Either[Throwable, UUID]] = runtime.unsafeRunToFuture(playZIO(userMove))
 }

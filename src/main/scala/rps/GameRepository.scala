@@ -1,40 +1,43 @@
 package rps
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import java.util.UUID
 import java.sql.Timestamp
 import java.time.Instant
 
 import slick.driver.H2Driver.backend.DatabaseDef
 import slick.driver.H2Driver.api._
-
-import db.Tables.{Plays, PlayRow}
+import db.Tables.{PlayRow, Plays}
 import model._
+import zio.{IO, Task}
 
 trait GameRepository {
-  def save(play: Play): Future[Either[Throwable, UUID]]
-  def read(): Future[Either[Throwable, Option[Play]]]
+  def save(play: Play): IO[Throwable, UUID]
+  def read(): IO[Throwable, Option[Play]]
 }
 
 class GameRepositoryImpl(
   db: DatabaseDef
 )(
   implicit ec: ExecutionContext
-) extends GameRepository with SlickRepository {
+) extends GameRepository {
 
-  override def save(play: Play): Future[Either[Throwable, UUID]] = {
+  override def save(play: Play): IO[Throwable, UUID] = {
     val playRow = convertPlay(play)
     val newPlay = Plays += playRow
-    
-    futureToEither(db.run(newPlay).map(_ => playRow.id))
+
+    IO.fromFuture {
+      implicit ec => db.run(newPlay).map(_ => playRow.id)
+    }
   }
 
-  override def read(): Future[Either[Throwable, Option[Play]]] = { 
+  override def read(): IO[Throwable, Option[Play]] = {
     val selectPlay = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
-    futureToEither(db.run(selectPlay).map(_.flatMap(convertPlayRow)))
-  } 
+    val maybePlayRowIO: Task[Option[PlayRow]] = IO.fromFuture { implicit ec => db.run(selectPlay)}
+    maybePlayRowIO.map(_.flatMap(convertPlayRow))
+  }
 
-  private val convertPlayRow = (r: PlayRow) => for {
+  private def convertPlayRow (r: PlayRow) : Option[Play] = for {
     userMove <- Move.caseFromString(r.userMove)
     computerMove <- Move.caseFromString(r.computerMove)
     result <- Result.caseFromString(r.result)

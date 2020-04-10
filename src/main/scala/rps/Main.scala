@@ -33,8 +33,8 @@ object Main extends App with RouterDerivationModule {
     val gameService = new GameServiceImpl(gameRepository)
     val gameController = new GameControllerImpl(gameService)
     val gameRouter = deriveRouter[GameController](gameController)
-    
-    val rpcServer = new HttpRPCServer(
+
+    new HttpRPCServer(
       config = Config("localhost", 8080),
       routers = List(gameRouter)
     )
