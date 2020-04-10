@@ -15,8 +15,7 @@ trait GameController {
   def result(): Future[Either[Throwable, PlayResponse]]
 }
 
-class GameControllerImpl(gameService: GameService)(implicit ec: ExecutionContext) extends GameController {
-  val runtime = Runtime.default
+class GameControllerImpl(gameService: GameService)(implicit runtime: Runtime[ZEnv]) extends GameController {
 
   private[this] def resultZIO: URIO[Any, Either[Throwable, PlayResponse]] = gameService
     .getResult()

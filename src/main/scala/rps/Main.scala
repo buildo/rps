@@ -6,13 +6,12 @@ import akka.http.scaladsl.model.{ContentType, HttpEntity, HttpResponse, MediaTyp
 import wiro.Config
 import wiro.server.akkaHttp._
 import wiro.server.akkaHttp.FailSupport._
-
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
-
 import rps.model.PlayResponse
 import rps.db.AppDbContext
+import zio.Runtime
 
 object Main extends App with RouterDerivationModule {
   implicit val system = ActorSystem("rps")
@@ -27,6 +26,7 @@ object Main extends App with RouterDerivationModule {
   }
 
   val db = AppDbContext.getDBRef("h2mem1")
+  implicit val runtime = Runtime.default
 
   AppDbContext.createSchema(db).map(_ => {
     val gameRepository = new GameRepositoryImpl(db)
