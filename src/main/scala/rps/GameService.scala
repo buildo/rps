@@ -11,6 +11,7 @@ import Result._
 
 trait GameService {
   def playMove(userMove: Move): IO[RPSError, UUID]
+
   def getResult(): IO[RPSError, Option[Play]]
 }
 
@@ -21,7 +22,7 @@ class GameServiceImpl(repository: GameRepository) extends GameService {
       case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) => Win
       case (x, y) if x == y                                     => Draw
       case _                                                    => Lose
-    }    
+    }
     val play = Play(userMove, computerMove, result)
 
     repository.save(play)

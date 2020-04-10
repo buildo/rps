@@ -19,27 +19,31 @@ object Main extends App with RouterDerivationModule {
   implicit val executionContext = system.dispatcher
 
   implicit def throwableResponse: ToHttpResponse[RPSError] = {
-    case RPSError.NeverPlayed => HttpResponse(
-      status = StatusCodes.NotFound,
-    )
-    case RPSError.DBError(message) => HttpResponse(
-      status = StatusCodes.InternalServerError,
-      entity = message
-    )
+    case RPSError.NeverPlayed =>
+      HttpResponse(
+        status = StatusCodes.NotFound
+      )
+    case RPSError.DBError(message) =>
+      HttpResponse(
+        status = StatusCodes.InternalServerError,
+        entity = message
+      )
   }
 
   val db = AppDbContext.getDBRef("h2mem1")
   implicit val runtime = Runtime.default
 
-  AppDbContext.createSchema(db).map(_ => {
-    val gameRepository = new GameRepositoryImpl(db)
-    val gameService = new GameServiceImpl(gameRepository)
-    val gameController = new GameControllerImpl(gameService)
-    val gameRouter = deriveRouter[GameController](gameController)
+  AppDbContext
+    .createSchema(db)
+    .map(_ => {
+      val gameRepository = new GameRepositoryImpl(db)
+      val gameService = new GameServiceImpl(gameRepository)
+      val gameController = new GameControllerImpl(gameService)
+      val gameRouter = deriveRouter[GameController](gameController)
 
-    new HttpRPCServer(
-      config = Config("localhost", 8080),
-      routers = List(gameRouter)
-    )
-  })
+      new HttpRPCServer(
+        config = Config("localhost", 8080),
+        routers = List(gameRouter)
+      )
+    })
 }

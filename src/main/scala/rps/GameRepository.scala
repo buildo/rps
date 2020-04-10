@@ -13,6 +13,7 @@ import zio.{IO, Task}
 
 trait GameRepository {
   def save(play: Play): IO[RPSError, UUID]
+
   def read(): IO[RPSError, Option[Play]]
 }
 
@@ -26,22 +27,23 @@ class GameRepositoryImpl(
     val playRow = convertPlay(play)
     val newPlay = Plays += playRow
 
-    IO.fromFuture { _ =>
-      db.run(newPlay)
-    }.as(playRow.id).mapError(e => RPSError.DBError(e.getMessage))
+    IO.fromFuture { _ => db.run(newPlay) }
+      .as(playRow.id)
+      .mapError(e => RPSError.DBError(e.getMessage))
   }
 
   override def read(): IO[RPSError, Option[Play]] = {
     val selectPlay = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
-    val maybePlayRowIO: Task[Option[PlayRow]] = IO.fromFuture { implicit ec => db.run(selectPlay)}
+    val maybePlayRowIO: Task[Option[PlayRow]] = IO.fromFuture { implicit ec => db.run(selectPlay) }
     maybePlayRowIO.map(_.flatMap(convertPlayRow))
   }.mapError(e => RPSError.DBError(e.getMessage))
 
-  private def convertPlayRow (r: PlayRow) : Option[Play] = for {
-    userMove <- Move.caseFromString(r.userMove)
-    computerMove <- Move.caseFromString(r.computerMove)
-    result <- Result.caseFromString(r.result)
-  } yield Play(userMove, computerMove, result)
+  private def convertPlayRow(r: PlayRow): Option[Play] =
+    for {
+      userMove <- Move.caseFromString(r.userMove)
+      computerMove <- Move.caseFromString(r.computerMove)
+      result <- Result.caseFromString(r.result)
+    } yield Play(userMove, computerMove, result)
 
   private def convertPlay(game: Play): PlayRow =
     PlayRow(

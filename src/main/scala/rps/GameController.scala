@@ -15,17 +15,22 @@ trait GameController {
   def result(): Future[Either[RPSError, PlayResponse]]
 }
 
-class GameControllerImpl(gameService: GameService)(implicit runtime: Runtime[ZEnv]) extends GameController {
+class GameControllerImpl(gameService: GameService)(implicit runtime: Runtime[ZEnv])
+    extends GameController {
 
-  private[this] def resultZIO: URIO[Any, Either[RPSError, PlayResponse]] = gameService
-    .getResult()
-    .someOrFail(RPSError.NeverPlayed)
-    .map(play => PlayResponse(play.userMove, play.computerMove, play.result))
-    .either
+  private[this] def resultZIO: URIO[Any, Either[RPSError, PlayResponse]] =
+    gameService
+      .getResult()
+      .someOrFail(RPSError.NeverPlayed)
+      .map(play => PlayResponse(play.userMove, play.computerMove, play.result))
+      .either
 
-  private[this] def playZIO(userMove: Move): URIO[Any, Either[RPSError, UUID]] = gameService.playMove(userMove).either
+  private[this] def playZIO(userMove: Move): URIO[Any, Either[RPSError, UUID]] =
+    gameService.playMove(userMove).either
 
-  override def result(): Future[Either[RPSError, PlayResponse]] = runtime.unsafeRunToFuture(resultZIO)
+  override def result(): Future[Either[RPSError, PlayResponse]] =
+    runtime.unsafeRunToFuture(resultZIO)
 
-  override def play(userMove: Move): Future[Either[RPSError, UUID]] = runtime.unsafeRunToFuture(playZIO(userMove))
+  override def play(userMove: Move): Future[Either[RPSError, UUID]] =
+    runtime.unsafeRunToFuture(playZIO(userMove))
 }
