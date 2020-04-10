@@ -20,7 +20,7 @@ class GameControllerImpl(gameService: GameService)(implicit ec: ExecutionContext
 
   private[this] def resultZIO = gameService
     .getResult()
-    .map(_.getOrElse(throw new IllegalStateException))
+    .someOrFail(new IllegalStateException)
     .map(play => PlayResponse(play.userMove, play.computerMove, play.result))
     .either
 
