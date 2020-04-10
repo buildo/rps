@@ -10,12 +10,12 @@ import Move._
 import Result._
 
 trait GameService {
-  def playMove(userMove: Move): IO[Throwable, UUID]
-  def getResult(): IO[Throwable, Option[Play]]
+  def playMove(userMove: Move): IO[RPSError, UUID]
+  def getResult(): IO[RPSError, Option[Play]]
 }
 
 class GameServiceImpl(repository: GameRepository) extends GameService {
-  override def playMove(userMove: Move): IO[Throwable, UUID] = {
+  override def playMove(userMove: Move): IO[RPSError, UUID] = {
     val computerMove = generateComputerMove()
     val result = (userMove, computerMove) match {
       case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) => Win
@@ -30,6 +30,6 @@ class GameServiceImpl(repository: GameRepository) extends GameService {
   private def generateComputerMove(): Move =
     Random.shuffle(List(Rock, Paper, Scissors)).head
 
-  override def getResult(): IO[Throwable, Option[Play]] =
+  override def getResult(): IO[RPSError, Option[Play]] =
     repository.read()
 }

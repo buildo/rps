@@ -9,7 +9,7 @@ import wiro.server.akkaHttp.FailSupport._
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
-import rps.model.PlayResponse
+import rps.model.RPSError
 import rps.db.AppDbContext
 import zio.Runtime
 
@@ -18,10 +18,13 @@ object Main extends App with RouterDerivationModule {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  implicit def throwableResponse: ToHttpResponse[Throwable] = { error =>
-    HttpResponse(
+  implicit def throwableResponse: ToHttpResponse[RPSError] = {
+    case RPSError.NeverPlayed => HttpResponse(
+      status = StatusCodes.NotFound,
+    )
+    case RPSError.DBError(message) => HttpResponse(
       status = StatusCodes.InternalServerError,
-      entity = error.toString
+      entity = message
     )
   }
 
