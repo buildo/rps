@@ -18,14 +18,14 @@ trait GameController {
 class GameControllerImpl(gameService: GameService)(implicit runtime: Runtime[ZEnv])
     extends GameController {
 
-  private[this] def resultZIO: URIO[Any, Either[RPSError, PlayResponse]] =
+  private[this] def resultZIO: UIO[Either[RPSError, PlayResponse]] =
     gameService
       .getResult()
       .someOrFail(RPSError.NeverPlayed)
       .map(play => PlayResponse(play.userMove, play.computerMove, play.result))
       .either
 
-  private[this] def playZIO(userMove: Move): URIO[Any, Either[RPSError, UUID]] =
+  private[this] def playZIO(userMove: Move): UIO[Either[RPSError, UUID]] =
     gameService.playMove(userMove).either
 
   override def result(): Future[Either[RPSError, PlayResponse]] =
