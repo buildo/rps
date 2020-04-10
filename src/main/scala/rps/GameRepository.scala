@@ -34,7 +34,7 @@ class GameRepositoryImpl(
 
   override def read(): IO[RPSError, Option[Play]] = {
     val selectPlay = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
-    val maybePlayRowIO: Task[Option[PlayRow]] = IO.fromFuture { implicit ec => db.run(selectPlay) }
+    val maybePlayRowIO: Task[Option[PlayRow]] = IO.fromFuture { _ => db.run(selectPlay) }
     maybePlayRowIO.map(_.flatMap(convertPlayRow))
   }.mapError(e => RPSError.DBError(e.getMessage))
 
