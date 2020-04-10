@@ -26,9 +26,9 @@ class GameRepositoryImpl(
     val playRow = convertPlay(play)
     val newPlay = Plays += playRow
 
-    IO.fromFuture {
-      implicit ec => db.run(newPlay).map(_ => playRow.id)
-    }
+    IO.fromFuture { _ =>
+      db.run(newPlay)
+    }.as(playRow.id)
   }
 
   override def read(): IO[Throwable, Option[Play]] = {
