@@ -19,11 +19,3 @@ project/plugins/project/
 *.log
 
 # End of https://www.gitignore.io/api/sbt,scala
-
-### IntelliJ ###
-.idea/
-
-### Bloop ###
-.bloop/
-.metals/
-project/metals.sbt
