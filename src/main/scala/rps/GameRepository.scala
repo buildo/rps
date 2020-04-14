@@ -35,7 +35,7 @@ class GameRepositoryImpl(
   }
 
   override def read(): IO[RPSError, Option[Play]] = {
-    val sql: SqlAction[Option[PlayRow], NoStream, Effect.Read] = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
+    val sql: DBIO[Option[PlayRow]] = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
     val playRowTask: Task[Option[PlayRow]] = IO.fromFuture { _ => db.run(sql) }
     playRowTask.map(_.flatMap(convertPlayRow))
   }.mapError(e => RPSError.DBError(e.getMessage))
