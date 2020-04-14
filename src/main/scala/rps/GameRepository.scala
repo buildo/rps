@@ -1,44 +1,51 @@
 package rps
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import java.util.UUID
 import java.sql.Timestamp
 import java.time.Instant
 
 import slick.driver.H2Driver.backend.DatabaseDef
 import slick.driver.H2Driver.api._
-
-import db.Tables.{Plays, PlayRow}
+import db.Tables.{PlayRow, Plays}
 import model._
+import slick.dbio.Effect
+import slick.sql.SqlAction
+import zio.{IO, Task, ZIO}
 
 trait GameRepository {
-  def save(play: Play): Future[Either[Throwable, UUID]]
-  def read(): Future[Either[Throwable, Option[Play]]]
+  def save(play: Play): IO[RPSError, UUID]
+
+  def read(): IO[RPSError, Option[Play]]
 }
 
 class GameRepositoryImpl(
   db: DatabaseDef
 )(
   implicit ec: ExecutionContext
-) extends GameRepository with SlickRepository {
+) extends GameRepository {
 
-  override def save(play: Play): Future[Either[Throwable, UUID]] = {
+  override def save(play: Play): IO[RPSError, UUID] = {
     val playRow = convertPlay(play)
     val newPlay = Plays += playRow
-    
-    futureToEither(db.run(newPlay).map(_ => playRow.id))
+
+    IO.fromFuture { _ => db.run(newPlay) }
+      .as(playRow.id)
+      .mapError(e => RPSError.DBError(e.getMessage))
   }
 
-  override def read(): Future[Either[Throwable, Option[Play]]] = { 
-    val selectPlay = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
-    futureToEither(db.run(selectPlay).map(_.flatMap(convertPlayRow)))
-  } 
+  override def read(): IO[RPSError, Option[Play]] = {
+    val sql: DBIO[Option[PlayRow]] = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
+    val playRowTask: Task[Option[PlayRow]] = IO.fromFuture { _ => db.run(sql) }
+    playRowTask.map(_.flatMap(convertPlayRow))
+  }.mapError(e => RPSError.DBError(e.getMessage))
 
-  private val convertPlayRow = (r: PlayRow) => for {
-    userMove <- Move.caseFromString(r.userMove)
-    computerMove <- Move.caseFromString(r.computerMove)
-    result <- Result.caseFromString(r.result)
-  } yield Play(userMove, computerMove, result)
+  private def convertPlayRow(r: PlayRow): Option[Play] =
+    for {
+      userMove <- Move.caseFromString(r.userMove)
+      computerMove <- Move.caseFromString(r.computerMove)
+      result <- Result.caseFromString(r.result)
+    } yield Play(userMove, computerMove, result)
 
   private def convertPlay(game: Play): PlayRow =
     PlayRow(
