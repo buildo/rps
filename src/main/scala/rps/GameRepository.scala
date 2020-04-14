@@ -9,7 +9,9 @@ import slick.driver.H2Driver.backend.DatabaseDef
 import slick.driver.H2Driver.api._
 import db.Tables.{PlayRow, Plays}
 import model._
-import zio.{IO, Task}
+import slick.dbio.Effect
+import slick.sql.SqlAction
+import zio.{IO, Task, ZIO}
 
 trait GameRepository {
   def save(play: Play): IO[RPSError, UUID]
@@ -33,9 +35,9 @@ class GameRepositoryImpl(
   }
 
   override def read(): IO[RPSError, Option[Play]] = {
-    val selectPlay = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
-    val maybePlayRowIO: Task[Option[PlayRow]] = IO.fromFuture { _ => db.run(selectPlay) }
-    maybePlayRowIO.map(_.flatMap(convertPlayRow))
+    val sql: SqlAction[Option[PlayRow], NoStream, Effect.Read] = Plays.sortBy(_.createdAt.desc).take(1).result.headOption
+    val playRowTask: Task[Option[PlayRow]] = IO.fromFuture { _ => db.run(sql) }
+    playRowTask.map(_.flatMap(convertPlayRow))
   }.mapError(e => RPSError.DBError(e.getMessage))
 
   private def convertPlayRow(r: PlayRow): Option[Play] =
