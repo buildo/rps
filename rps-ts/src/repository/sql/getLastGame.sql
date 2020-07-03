@@ -1,0 +1,1 @@
+select user_move, computer_move, result from play order by created_at desc limit 1
