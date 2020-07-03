@@ -1,0 +1,11 @@
+version: "3"
+services:
+  rps-db:
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql      
+    image: postgres:10
+    ports:
+      - 9090:5432
+    environment:
+      POSTGRES_DB: rps
+      POSTGRES_PASSWORD: rps
