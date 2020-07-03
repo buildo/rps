@@ -1,0 +1,1 @@
+insert into play(user_move, computer_move, result) values(${userMove}, ${computerMove}, ${result})

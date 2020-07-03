@@ -1,0 +1,33 @@
+{
+  "name": "rps-ts",
+  "version": "1.0.0",
+  "license": "MIT",
+  "engines": {
+    "node": "^10"
+  },
+  "scripts": {
+    "clean": "rm -rf ./build && mkdir ./build",
+    "build": "tsc",
+    "node-start": "node build",
+    "start": "nodemon --watch 'src' --exec 'ts-node' ./src/index.ts",
+    "prettier": "prettier --write \"./src/{**/*,*}.ts\"",
+    "prettier-check": "prettier --list-different \"./src/{**/*,*}.ts\""
+  },
+  "devDependencies": {
+    "@types/debug": "^4.1.5",
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.0.4",
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "fp-ts": "^2.6.1",
+    "io-ts": "^2.2.3",
+    "io-ts-types": "^0.5.6",
+    "pg-promise": "^10.5.6"
+  }
+}
