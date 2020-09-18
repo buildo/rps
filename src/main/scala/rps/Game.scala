@@ -16,8 +16,7 @@ object Game {
       case Some(userMove) =>
         val computerMove = generateComputerMove()
         println(s"Your move: ${CaseEnumSerialization[Move].caseToString(userMove)}. Computer move: ${CaseEnumSerialization[Move].caseToString(computerMove)}")
-        val result = play(userMove, computerMove)
-        result match {
+        play(userMove, computerMove) match {
           case Win  => println("You Win!")
           case Draw => println("It's a Draw!")
           case _    => println("You Lose :(")
