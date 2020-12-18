@@ -16,14 +16,14 @@ global.userMove = null;
 
 fetchMock
   .mock(
-    'http://localhost:8080/rps/play',
+    'http://localhost:1337/localhost:8080/rps/play',
     (url, { body }) => {
       global.userMove = JSON.parse(body).userMove;
       return 'OK';
     },
     { method: 'POST' },
   )
-  .mock('http://localhost:8080/rps/result', () => ({
+  .mock('http://localhost:1337/localhost:8080/rps/result', () => ({
     userMove: global.userMove,
     computerMove: randomMove(),
     result: 'Win',
@@ -36,7 +36,7 @@ class App extends Component {
   state = {};
 
   playNewGame(move) {
-    fetch('http://localhost:8080/rps/play', {
+    fetch('http://localhost:1337/localhost:8080/rps/play', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ class App extends Component {
   }
 
   getPlayedGame() {
-    fetch('http://localhost:8080/rps/result', {
+    fetch('http://localhost:1337/localhost:8080/rps/result', {
       headers: {
         'Content-Type': 'application/json',
       },
