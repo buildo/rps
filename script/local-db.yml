@@ -1,0 +1,18 @@
+version: "3"
+
+volumes:
+  rps_game:
+    name: rps_game_db
+
+services:
+  rps-db:    
+    image: postgres:10
+    ports:
+      - 9001:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: rps
+      POSTGRES_PASSWORD: password
+    command: -c 'max_connections=512'
+    volumes:
+      - rps_game/:/games
