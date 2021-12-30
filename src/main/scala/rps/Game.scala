@@ -20,7 +20,7 @@ object Game {
   def play(): Unit = {
 
     for {
-      res <- awaitFeature(
+      res <- awaitFuture(
         gameRepository.readLastMatch(),
         "impossible to read last match"
       )
@@ -51,7 +51,7 @@ object Game {
         }
 
         for {
-          _ <- awaitFeature(
+          _ <- awaitFuture(
             gameRepository.save(userMove, computerMove, matchResult),
             "impossible to save game result"
           )
@@ -62,7 +62,7 @@ object Game {
   private def generateComputerMove(): Move =
     Random.shuffle(List(Rock, Paper, Scissors)).head
 
-  private def awaitFeature[R](
+  private def awaitFuture[R](
       f: Future[Either[Throwable, R]],
       errMsg: String
   ): Option[R] =
