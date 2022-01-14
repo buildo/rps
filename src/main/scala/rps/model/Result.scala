@@ -1,9 +1,9 @@
 package rps.model
 
-sealed trait Result
+import io.buildo.enumero.annotations.enum
 
-object Result {
-  case object Win extends Result
-  case object Lose extends Result
-  case object Draw extends Result
+@enum trait Result {
+  object Win
+  object Lose
+  object Draw
 }

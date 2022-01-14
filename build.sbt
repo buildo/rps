@@ -5,5 +5,9 @@ ThisBuild / organizationName := "buildo"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "rps"
+    name := "rps",
+    libraryDependencies ++= List(
+      "io.buildo" %% "enumero" % "1.4.2"
+    ),
+    scalacOptions += "-Ymacro-annotations"
   )
