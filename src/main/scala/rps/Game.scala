@@ -9,16 +9,10 @@ object Game {
       StdIn.readLine("Your move (0: Rock, 1: Paper, 2: Scissors)> ")
     val computerMove = generateComputerMove()
     println(s"Your move: $userMove. Computer move: $computerMove")
-    if (userMove == computerMove) {
-      println("It's a draw!")
-    } else if (
-      userMove == "0" && computerMove == "2" ||
-      userMove == "2" && computerMove == "1" ||
-      userMove == "1" && computerMove == "0"
-    ) {
-      println("You win!")
-    } else {
-      println("You lose :(")
+    (userMove, computerMove) match {
+      case ("0", "2") | ("1", "0") | ("2", "1") => println("You win!")
+      case (x, y) if x == y                     => println("It's a draw!")
+      case _                                    => println("You lose :(")
     }
   }
 
