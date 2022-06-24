@@ -7,7 +7,8 @@ lazy val root = (project in file("."))
   .settings(
     name := "rps",
     libraryDependencies ++= List(
-      "io.buildo" %% "enumero" % "1.4.2"
+      "io.buildo" %% "enumero" % "1.4.2",
+      "org.scalameta" %% "munit" % "0.7.29" % Test
     ),
     scalacOptions += "-Ymacro-annotations"
   )
