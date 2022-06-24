@@ -2,8 +2,9 @@ package rps
 
 import scala.io.StdIn
 import scala.util.Random
-import model.Move
+import model.{Move, Result}
 import Move._
+import Result._
 
 object Game {
   def play(): Unit = {
@@ -17,14 +18,20 @@ object Game {
         println(
           s"Your move: ${Move.show(userMove)}. Computer move: ${Move.show(computerMove)}"
         )
-        (userMove, computerMove) match {
-          case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) =>
-            println("You win!")
-          case (x, y) if x == y => println("It's a draw!")
-          case _                => println("You lose :(")
+        evaluatePlay(userMove, computerMove) match {
+          case Win  => println("You win!")
+          case Draw => println("It's a draw!")
+          case Lose => println("You lose :(")
         }
     }
   }
+
+  def evaluatePlay(userMove: Move, computerMove: Move): Result =
+    (userMove, computerMove) match {
+      case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) => Win
+      case (x, y) if x == y                                     => Draw
+      case _                                                    => Lose
+    }
 
   private def generateComputerMove(): Move =
     Random.shuffle(List(Rock, Paper, Scissors)).head
