@@ -1,3 +1,4 @@
 import { play } from "./game";
+import { stdin as input, stdout as output } from "node:process";
 
-play("Wanna play? Your move (0: Rock, 1: Paper, 2: Scissors) \n");
+play(input, output);

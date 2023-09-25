@@ -1,25 +1,42 @@
 import * as readline from "node:readline/promises";
-import { stdin as input, stdout as output, stdout } from "node:process";
 import { match, P } from "ts-pattern";
+import { read, Move } from "./model/Move";
 
-const rl = readline.createInterface({ input, output });
-
-function generateComputerMove() {
-  return String(Math.round(Math.random() * 2));
+export function generateComputerMove() {
+  return read(String(Math.round(Math.random() * 2)));
 }
-export async function play(question: string) {
-  const computerMove = generateComputerMove();
-  const userMove = await rl.question(question);
 
-  stdout.write(`You chose:  ${userMove}\nComputer chosed:  ${computerMove}\n`);
-  match([userMove, computerMove])
-    .with(["0", "2"], ["1", "0"], ["2", "1"], () => stdout.write(`You win!\n`))
+export function playLogic(userMove: Move, computerMove: Move) {
+  return match([userMove, computerMove])
+    .returnType<string>()
+    .with(
+      ["Rock", "Scissors"],
+      ["Scissors", "Paper"],
+      ["Paper", "Rock"],
+      () => "Win"
+    )
 
     .with(
       P.when(() => userMove === computerMove),
-      () => stdout.write(`Draw!\n`)
+      () => "Draw"
     )
-    .otherwise(() => stdout.write(`You lose :<\n`));
+    .otherwise(() => "Lose");
+}
+
+export async function play(
+  input: NodeJS.ReadableStream,
+  output: NodeJS.WritableStream
+) {
+  const rl = readline.createInterface({ input, output });
+  const computerMove = generateComputerMove();
+  const userMove = read(
+    await rl.question(
+      "Wanna play? Your move (0: Rock, 1: Paper, 2: Scissors) \n"
+    )
+  );
+
+  output.write(`You chose:  ${userMove}\nComputer chosed:  ${computerMove}\n`);
+  output.write("The result is... " + playLogic(userMove, computerMove) + " !");
 
   rl.close();
 }

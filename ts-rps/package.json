@@ -2,7 +2,8 @@
 	"devDependencies": {
 		"@types/node": "^20.6.5",
 		"prettier": "^3.0.3",
-		"typescript": "^5.2.2"
+		"typescript": "^5.2.2",
+		"vitest": "^0.34.5"
 	},
 	"dependencies": {
 		"ts-pattern": "^5.0.5"
