@@ -1,4 +1,2 @@
-import { play } from "./game";
-import { stdin as input, stdout as output } from "node:process";
-
-play(input, output);
+import { app } from "./routes/api";
+app.listen(3000);

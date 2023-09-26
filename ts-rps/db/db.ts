@@ -23,6 +23,12 @@ export async function logRes(res: string) {
   return await db.none(addResult, [res]);
 }
 
+export async function allGames(): Promise<any[]> {
+  return await db.any(
+    "SELECT game_date, result FROM results ORDER BY game_date"
+  );
+}
+
 export function closeDB() {
   db.$pool.end();
 }

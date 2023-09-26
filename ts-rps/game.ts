@@ -1,8 +1,7 @@
-import * as readline from "node:readline/promises";
 import { match, P } from "ts-pattern";
 import { read, Move } from "./model/Move";
-import { result } from "./model/Result";
-import { logRes, lastGame } from "./db/db";
+import { ResultArray, resultArray, result } from "./model/Result";
+import { logRes, allGames, lastGame } from "./db/db";
 
 export function generateComputerMove(): Move {
   return read(String(Math.round(Math.random() * 2)));
@@ -22,7 +21,7 @@ export async function playLogic(
       P.when(() => userMove === computerMove),
       () => ["DRAW", "It's a Draw!"]
     )
-    .otherwise(() => ["DEFEAT", "You lose :< "]);
+    .otherwise(() => ["LOSE", "You lose :< "]);
   const isDbWritten = await logRes(dbOutcome);
   if (isDbWritten === null) {
     return messageOutcome;
@@ -31,34 +30,25 @@ export async function playLogic(
   }
 }
 
-export async function welcome(): Promise<string> {
-  let res = "Wanna play? Your move (0: Rock, 1: Paper, 2: Scissors)\n";
+export async function welcome(): Promise<string[]> {
+  const res = ["Wanna play? Your move (0: Rock, 1: Paper, 2: Scissors)"];
   const lastGameParsed = result.safeParse(await lastGame());
   if (lastGameParsed.success) {
-    res = res.concat(
-      "Our last game timestamp is : " +
-        lastGameParsed.data.game_date +
-        "\n" +
-        "and the game finished with this result : " +
+    res.push(
+      "Our last game timestamp is : " + lastGameParsed.data.game_date + "\n"
+    );
+    res.push(
+      "and the game finished with this result : " +
         lastGameParsed.data.result +
         "\n"
     );
+    return res;
   } else {
-    res = res.concat("Welcome to the best RPS game ever! \n");
+    res.push("Welcome to the best RPS game ever! \n");
+    return res;
   }
-  return res;
 }
 
-export async function play(
-  input: NodeJS.ReadableStream,
-  output: NodeJS.WritableStream
-) {
-  const rl = readline.createInterface({ input, output });
-  const computerMove = generateComputerMove();
-  const welcomeMessage = await welcome();
-  const userMove = read(await rl.question(welcomeMessage));
-  const result = await playLogic(userMove, computerMove);
-  output.write(`You chose:  ${userMove}\nComputer chosed:  ${computerMove}\n`);
-  output.write("The result is... " + result + " !");
-  rl.close();
+export async function allGamesParsed(): Promise<ResultArray> {
+  return resultArray.parse(await allGames());
 }
