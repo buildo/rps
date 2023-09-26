@@ -1,0 +1,19 @@
+{
+	"devDependencies": {
+		"@types/node": "^20.6.5",
+		"prettier": "^3.0.3",
+		"typescript": "^5.2.2",
+		"vitest": "^0.34.5"
+	},
+	"scripts": {
+		"test": "vitest"
+	},
+	"dependencies": {
+		"@zodios/core": "^10.9.6",
+		"@zodios/express": "^10.6.1",
+		"pg-promise": "^11.5.4",
+		"ts-pattern": "^5.0.5",
+		"zod": "^3.22.2",
+		"zodios": "^5.1.0"
+	}
+}
