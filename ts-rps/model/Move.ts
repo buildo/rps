@@ -1,16 +1,21 @@
-import { match, P } from "ts-pattern";
+import { z } from "zod";
 
-export type Move = "Rock" | "Paper" | "Scissors";
+const moves = {
+  0: "Rock",
+  1: "Paper",
+  2: "Scissors",
+} as const;
+
+export const Move = z.enum(["0", "1", "2"]).transform((index) => moves[index]);
+export type Move = z.infer<typeof Move>;
 
 export function read(input: string): Move {
-  return match(input)
-    .returnType<Move>()
-    .with("0", () => "Rock")
-    .with("1", () => "Paper")
-    .with("2", () => "Scissors")
-    .otherwise(() => {
-      throw new RangeError(
-        "Sorry, you must enter a valid move (0, 1 or 2). Try again"
-      );
-    });
+  const res = Move.safeParse(input);
+  if (res.success) {
+    return res.data;
+  } else {
+    throw new RangeError(
+      "Sorry, you must enter a valid move (0, 1 or 2). Try again"
+    );
+  }
 }
