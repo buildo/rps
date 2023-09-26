@@ -2,13 +2,13 @@ import { expect, test } from "vitest";
 import { playLogic } from "./game";
 import { read } from "./model/Move";
 
-test("game logic test", () => {
-  expect(playLogic("Rock", "Paper")).toBe("Lose");
-  expect(playLogic("Rock", "Scissors")).toBe("Win");
-  expect(playLogic("Paper", "Rock")).toBe("Win");
-  expect(playLogic("Paper", "Scissors")).toBe("Lose");
-  expect(playLogic("Scissors", "Rock")).toBe("Lose");
-  expect(playLogic("Scissors", "Paper")).toBe("Win");
+test("game logic test", async () => {
+  expect(await playLogic("Rock", "Paper")).toContain("You lose :<");
+  expect(await playLogic("Rock", "Scissors")).toContain("You Win!!!");
+  expect(await playLogic("Paper", "Rock")).toContain("You Win!!!");
+  expect(await playLogic("Paper", "Scissors")).toContain("You lose :<");
+  expect(await playLogic("Scissors", "Rock")).toContain("You lose :<");
+  expect(await playLogic("Scissors", "Paper")).toContain("You Win!!!");
 });
 
 test("read function test", () => {
