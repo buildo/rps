@@ -1,0 +1,14 @@
+version: "3"
+
+name: rps
+
+services:
+  rps-db:
+    image: postgres:16.2
+    ports:
+      - 9001:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: rps
+      POSTGRES_PASSWORD: password
+    command: -c 'max_connections=512'
