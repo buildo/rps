@@ -3,22 +3,34 @@ package rps
 import scala.io.StdIn
 import scala.util.Random
 
+import model.Move
+import Move.*
+
 object Game {
   def play(): Unit = {
-    val userMove = StdIn.readLine("Your move (0: Rock, 1: Paper, 2: Scissors)>")
-    val computerMove = generateComputerMove()
-    println(s"Your move: $userMove. Computer move: $computerMove")
-    (userMove, computerMove) match {
-      case ("0", "2") | ("1", "0") | ("2", "1") =>
-        println("You win!")
-      case (x, y) if x == y =>
-        println("It's a draw!")
-      case _ =>
-        println("You lose :(")
+    val rawUserMove =
+      StdIn.readLine("Your move (0: Rock, 1: Paper, 2: Scissors)>")
+    Move.read(rawUserMove) match {
+      case None =>
+        println("Sorry, you must enter a valid move (0, 1 or 2). Try again")
+      case Some(userMove) =>
+        val computerMove = generateComputerMove()
+        println(
+          s"Your move: ${Move.show(userMove)}. Computer move: ${Move.show(computerMove)}"
+        )
+
+        (userMove, computerMove) match {
+          case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) =>
+            println("You win!")
+          case (Rock, Rock) | (Paper, Paper) | (Scissors, Scissors) =>
+            println("It's a draw!")
+          case (Scissors, Rock) | (Rock, Paper) | (Paper, Scissors) =>
+            println("You lose :(")
+        }
     }
   }
 
-  private def generateComputerMove(): String = {
-    Random.nextInt(3).toString
+  private def generateComputerMove(): Move = {
+    Random.shuffle(List(Rock, Paper, Scissors)).head
   }
 }
