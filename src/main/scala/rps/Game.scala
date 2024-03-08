@@ -3,8 +3,9 @@ package rps
 import scala.io.StdIn
 import scala.util.Random
 
-import model.Move
+import model.{Move, Result}
 import Move.*
+import Result.*
 
 object Game {
   def play(): Unit = {
@@ -19,16 +20,20 @@ object Game {
           s"Your move: ${Move.show(userMove)}. Computer move: ${Move.show(computerMove)}"
         )
 
-        (userMove, computerMove) match {
-          case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) =>
-            println("You win!")
-          case (Rock, Rock) | (Paper, Paper) | (Scissors, Scissors) =>
-            println("It's a draw!")
-          case (Scissors, Rock) | (Rock, Paper) | (Paper, Scissors) =>
-            println("You lose :(")
+        evaluatePlay(userMove, computerMove) match {
+          case Win  => println("You win!")
+          case Draw => println("It's a draw!")
+          case Lose => println("You lose :(")
         }
     }
   }
+
+  def evaluatePlay(userMove: Move, computerMove: Move): Result =
+    (userMove, computerMove) match {
+      case (Rock, Scissors) | (Paper, Rock) | (Scissors, Paper) => Win
+      case (Rock, Rock) | (Paper, Paper) | (Scissors, Scissors) => Draw
+      case (Scissors, Rock) | (Rock, Paper) | (Paper, Scissors) => Lose
+    }
 
   private def generateComputerMove(): Move = {
     Random.shuffle(List(Rock, Paper, Scissors)).head
