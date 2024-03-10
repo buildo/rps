@@ -10,6 +10,7 @@ val V = new {
   val postgresql = "42.7.2"
   val slf4jNop = "2.0.12"
   val slick = "3.5.0"
+  val zio = "2.0.21"
 }
 
 lazy val root = (project in file("."))
@@ -19,6 +20,7 @@ lazy val root = (project in file("."))
       "com.typesafe" % "config" % V.config,
       "com.typesafe.slick" %% "slick" % V.slick,
       "com.typesafe.slick" %% "slick-hikaricp" % V.slick,
+      "dev.zio" %% "zio" % V.zio,
       "org.flywaydb" % "flyway-core" % V.flyway,
       "org.flywaydb" % "flyway-database-postgresql" % V.flyway,
       "org.postgresql" % "postgresql" % V.postgresql,

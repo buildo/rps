@@ -7,17 +7,18 @@ import slick.jdbc.JdbcBackend.Database
 import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.{ExecutionContext}
 import scala.concurrent.Future
+import zio.{IO, UIO, ZIO}
 
-import rps.model.{Move, Play, Result}
+import rps.model.{Move, Play, ReadLastMatchError, Result}
 
 import Tables.{Match, Row}
 
 trait GameRepository {
   def save(
       play: Play
-  ): Future[UUID]
+  ): UIO[UUID]
 
-  def readLastMatch(): Future[Option[Play]]
+  def readLastMatch(): IO[ReadLastMatchError, Play]
 }
 
 object GameRepository {
@@ -25,27 +26,33 @@ object GameRepository {
 
     def save(
         play: Play
-    ): Future[UUID] = {
-      val rowId = UUID.randomUUID
-      val row = Row(
-        id = rowId,
-        computerMove = play.computerMove.toString(),
-        userMove = play.userMove.toString(),
-        result = play.result.toString(),
-        occurredAt = Timestamp.from(Instant.now)
-      )
-      db.run(Match += row).map(_ => rowId)
-    }
+    ): UIO[UUID] =
+      ZIO.fromFuture { _ =>
+        val rowId = UUID.randomUUID
+        val row = Row(
+          id = rowId,
+          computerMove = play.computerMove.toString(),
+          userMove = play.userMove.toString(),
+          result = play.result.toString(),
+          occurredAt = Timestamp.from(Instant.now)
+        )
+        db.run(Match += row).map(_ => rowId)
+      }.orDie
 
-    def readLastMatch(): Future[Option[Play]] =
-      db.run(Match.sortBy(_.occurredAt.desc).take(1).result.headOption)
-        .map(_.map { r =>
-          Play(
-            userMove = Move.valueOf(r.userMove),
-            computerMove = Move.valueOf(r.computerMove),
-            result = Result.valueOf(r.result)
-          )
-        })
+    def readLastMatch(): IO[ReadLastMatchError, Play] =
+      ZIO
+        .fromFuture { _ =>
+          db.run(Match.sortBy(_.occurredAt.desc).take(1).result.headOption)
+            .map(_.map { r =>
+              Play(
+                userMove = Move.valueOf(r.userMove),
+                computerMove = Move.valueOf(r.computerMove),
+                result = Result.valueOf(r.result)
+              )
+            })
+        }
+        .orDie
+        .someOrFail(ReadLastMatchError.NoLastMatch)
 
   }
 }
